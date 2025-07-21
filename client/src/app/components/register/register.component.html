@@ -1,0 +1,131 @@
+<body>
+  <form #frm="ngForm" class="example-form" novalidate>
+    <br />
+    <h3> Register </h3>
+
+    <div class="row form-group">
+      <!-- <div class="col col-4">
+    <mat-form-field class="example-full-width control-label">
+      <input  class="form-control" #name="ngModel" name="email" matInput placeholder="הכנס את שם המשתמש או מייל" value=""[(ngModel)]="user.email" required>
+      <div *ngIf="name.errors && name.errors['required']">שדה חובה</div>
+    </mat-form-field>
+    </div>
+</div>       
+
+<div class="col col-4">
+    <mat-form-field class="example-full-width control-label">
+      <input  class="form-control" #name="ngModel" name="password" matInput placeholder="הכנס  סיסמה   " value=""[(ngModel)]="user.password" required>
+      <div *ngIf="name.errors && name.errors['required']">שדה חובה</div>
+    </mat-form-field>
+    </div>
+
+    <div class="col col-4">
+        <mat-form-field class="example-full-width control-label">
+          <input  class="form-control" #name="ngModel" name="phone" matInput placeholder="הכנס טלפון  " value=""[(ngModel)]="user.phone" required>
+          <div *ngIf="name.errors && name.errors['required']">שדה חובה</div>
+        </mat-form-field>
+        </div>
+
+  <div class="col col-4">
+    <mat-form-field class="example-full-width control-label">
+      <input  class="form-control" #name="ngModel" name="firstName" matInput placeholder="הכנס שם פרטי" value=""[(ngModel)]="user.firstName" required>
+      <div *ngIf="name.errors && name.errors['required']">שדה חובה</div>
+    </mat-form-field>
+    </div>
+  
+    <div class="col col-4">
+        <mat-form-field class="example-full-width control-label">
+          <input  class="form-control" #name="ngModel" name="lastName" matInput placeholder="הכנס שם משפחה  " value=""[(ngModel)]="user.lastName" required>
+          <div *ngIf="name.errors && name.errors['required']">שדה חובה</div>
+        </mat-form-field>
+        </div>
+    
+    <div class="col col-4">
+            <mat-form-field class="example-full-width control-label">
+              <input  class="form-control" #name="ngModel" name="city" matInput placeholder="הכנס עיר   " value=""[(ngModel)]="user.city" required>
+              <div *ngIf="name.errors && name.errors['required']">שדה חובה</div>
+            </mat-form-field>-->
+
+
+            <div class="row form-group email">
+              <div class="col col-4">
+                <mat-form-field class="example-full-width control-label">
+                  <input type="email" matInput  [(ngModel)]="user.email" [formControl]="mailFormControl" class="form-control" name="email" 
+                    placeholder="Enter email" required>
+                  
+                  <!-- הצגת הודעות שגיאה -->
+                  <mat-error *ngIf="mailFormControl.hasError('required')">Email is required</mat-error>
+                  <mat-error *ngIf="mailFormControl.hasError('email') && !mailFormControl.hasError('required')">
+                    Email is not valid
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+          
+            <div class="col col-4">
+              <mat-form-field class="example-full-width control-label">
+                <input type="password"  [(ngModel)]="user.password" matInput [formControl]="passwordFormControl" placeholder="Enter password"
+                  class="form-control" name="password">
+                
+                <!-- הצגת הודעות שגיאה -->
+                <mat-error *ngIf="passwordFormControl.hasError('required')">Password is required</mat-error>
+                <mat-error *ngIf="passwordFormControl.hasError('minlength') && !passwordFormControl.hasError('required')">
+                  Password must be between 5-15 characters
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="col col-4">
+              <mat-form-field class="example-full-width control-label">
+                <input type="phone"  [(ngModel)]="user.phone" matInput [formControl]="phoneFormControl" placeholder="Enter phone"
+                  class="form-control" name="phone">
+                
+                <!-- הצגת הודעות שגיאה -->
+                <mat-error *ngIf="phoneFormControl.hasError('required')">phone is required</mat-error>
+                <mat-error *ngIf="phoneFormControl.hasError('minlength') && !phoneFormControl.hasError('required')">
+                  phone must contain min 9 numbers!
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="col col-4">
+              <mat-form-field class="example-full-width control-label">
+                <input type="text"  [(ngModel)]="user.firstName" matInput [formControl]="nameFormControl" placeholder="Enter your firstName"
+                  class="form-control" name="firstName">
+                
+                <!-- הצגת הודעות שגיאה -->
+                <mat-error *ngIf="nameFormControl.hasError('required')">firstName is required</mat-error>
+
+              </mat-form-field>
+            </div>
+
+            <div class="col col-4">
+              <mat-form-field class="example-full-width control-label">
+                <input type="text"  [(ngModel)]="user.lastName" matInput [formControl]="nameFormControl" placeholder="Enter your lastName"
+                  class="form-control" name="lastName">
+                
+                <!-- הצגת הודעות שגיאה -->
+                <mat-error *ngIf="nameFormControl.hasError('required')">lastName is required</mat-error>
+
+              </mat-form-field>
+            </div>
+          
+            <div class="col col-4">
+              <mat-form-field class="example-full-width control-label">
+                <input type="text"  [(ngModel)]="user.city" matInput [formControl]="nameFormControl" placeholder="Enter your city"
+                  class="form-control" name="city">
+                
+                <!-- הצגת הודעות שגיאה -->
+                <mat-error *ngIf="nameFormControl.hasError('required')">city is required</mat-error>
+
+              </mat-form-field>
+            </div>
+    </div>
+    <button mat-button [disabled]="frm.invalid" [routerLink]="'login'" routerLinkActive="active" (click)="addNewUser(user)">
+      <mat-icon>save</mat-icon>save
+    </button>
+  </form>
+  <router-outlet></router-outlet>
+
+
+</body>

@@ -1,0 +1,143 @@
+
+body{
+background-color: #001f3d;
+margin: 0;
+color: white;
+}
+button {
+  margin: 0 8px 8px 0;
+  
+}
+table {
+  width: 100%;
+  background-color: #001f3d;
+  color: #f8f8f8;
+}
+.example-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.example-full-width {
+  width: 100%;
+}
+.mat-mdc-focus-indicator{
+  
+  
+}
+.mat-mdc-fab.mat-accent{
+  mdc-fab-container-color: #e0496f;
+  background-color:#FF4D4D;
+}
+.mat-mdc-header-row {
+  color: #ff4d4db4;
+
+}
+.mat-mdc-cell{
+  color: #f8f8f8;
+}
+.search-container {
+  display: flex;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* צל עדין */
+  border-radius: 50px;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease; /* מעבר חלק לצל */
+  width: 22%;
+  height: 8.5vh;
+  background-color: #001e3de0;
+  border: solid white;
+  padding: 3px;
+}
+.profit_btn{
+  display: flex;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* צל עדין */
+  border-radius: 50px;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease; /* מעבר חלק לצל */
+  width: 15%;
+  height: 6vh;
+  background-color: #001e3de0;
+  border: none;
+  padding: 3px;
+  color: hsl(0, 0%, 100%);
+
+}
+profit_btn:hover{background-color: #001e3d76;}
+.search-container:focus-within {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* צל בולט יותר בפוקוס */
+  border-radius: 50px;
+  transition: background-color 0.3s ease; /* מעבר חלק לצבע רקע */
+  height: 8vh;
+  background-color: #f8f8f800;
+  padding: 3px;
+}
+
+.search-input {
+  flex-grow: 1;
+  padding: 10px 16px;
+  border: none;
+  color: white;
+  outline: none;
+  background-color: #001e3d;
+  
+ 
+
+}
+
+.search-input:focus {
+  background-color: #da858508; /* רקע בהיר יותר בפוקוס */
+}
+
+.search-button {
+  background-color: #FF4D4D;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  /* cursor: pointer; */
+  transition: background-color 0.3s ease; /* מעבר חלק לצבע רקע */
+  /* width: 2vw;
+  height: 2.5vw; */
+  font-size: 0.5rem;
+}
+
+.search-button:hover {
+  background-color: black; /* כחול כהה יותר במעבר עכבר */
+}
+.imgGift{
+  width: 6vw;
+  height: 8vh;
+}
+.btn_gift{
+  display: flex;
+  padding: 2vw;
+  
+}
+.addNewGift{
+  width: 5.5vw;
+  height: 12vh;
+  position: relative;
+  left: 45%;
+  color: white;
+ 
+}
+/* .btngift{
+  width: 5.5vw;
+  height: 12vh;
+  position: relative;
+  left: 55%;
+  color: white;
+} */
+.btngift{
+  width: 5.5vw;
+  height: 12vh;
+  position: relative;
+  left: 55%;
+  color: #FF4D4D;
+  
+   background-color: rgba(252, 252, 252, 0); 
+   border: solid 1px white;
+  border-radius: 50%; 
+  /* padding: 2%; */
+  /* margin: 2%; */ 
+}

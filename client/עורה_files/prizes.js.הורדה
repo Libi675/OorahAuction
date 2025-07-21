@@ -1,0 +1,1145 @@
+//TODO make sure to change non eligible prizes
+var COSTTICKET =   ($('#language').val() == "heb"? 20 : 5 ) ;
+var LANGUAGE =   ($('#language').val() == "heb"? 'HEB' : "ENG" ) ;
+var TICKETWORD = (LANGUAGE == 'HEB'?"כרטיס": "tickets" ) ;
+var ENTRIESWORD = (LANGUAGE == 'HEB'?"כרטיס": "entries" ) ;
+let timeoutId;
+
+
+
+/* functions*/
+function addEmoji(element) {
+  if ($("body").attr("id") == "checkout-page") {
+    return false;
+  }
+  var prizenumber = element.closest(".parentdiv").attr("data-id");
+  element
+    .closest(".cart-buttons-outer")
+    .append("<p class='prize-emoji fly prize-emoji-" + prizenumber + "'></p>");
+
+  setTimeout(function () {
+    $(".prize-emoji-" + prizenumber).remove();
+  }, 25000);
+}
+function plurals(amt, option) {
+	if (LANGUAGE == 'HEB')  {
+		  if (amt >= 1) {
+            return "ים";
+        }
+	} else  {
+		  if (option == 2) {
+    if (amt == 1) {
+      return "y";
+    } else {
+      return "ies";
+    }
+  }
+  if (amt == 1) {
+    return "";
+  } else {
+    return option === "capital" ? "S" : "s";
+  }
+	}
+
+}
+
+function calculateTotalTickets() {
+  totalTickets = 0;
+  totalTicketsToDouble = 0;
+
+  Object.entries(prizes).map(([key, value]) => {
+    totalTickets += Number(value.amtinCart);
+    if (key != 18 && key != 24) {
+      totalTicketsToDouble += Number(value.amtinCart);
+    }
+  });
+
+  return [totalTickets, totalTicketsToDouble];
+}
+
+function submitCartThroughAjax() {
+  $.post("/scripts/save-shopping-cart.php", {
+    prizes: prizes,
+    package: packageSelected,
+    upsold: $("#upsold").val(),
+    sessiontoken: $("#sessiontoken").val(),
+  }).done(function (result) {
+    if ($("#pageName").val() === "cart") {
+      if (result != $("#sessionVar").val()) {
+        $("#sessionVar").val(result);
+      }
+    }
+  });
+}
+
+function adjustAmountinPrizeUpsell(element, direction) {
+
+  var prizenumber = element.closest(".upsell-prize").attr("data-id");
+  var currentinput = element.parent().find("input");
+  var currentvalue = Number(currentinput.val());
+  if (direction == "plus") {
+    prizes[prizenumber].amtinCart++;
+    currentinput.val(currentvalue + 1);
+  } else if (direction == "minus") {
+    if (currentvalue != 0) {
+      prizes[prizenumber].amtinCart--;
+      currentinput.val(currentvalue - 1);
+    }
+  } else if (direction == "text") {
+    var amount = element.val();
+    if (amount == "" || isNaN(amount) || amount <= 0 || amount > 9999) {
+      amount = 0;
+      element.val(0);
+    }
+
+    if (!Number.isInteger(amount)) {
+      amount = Math.round(amount);
+      element.val(amount);
+    }
+
+    prizes[prizenumber].amtinCart =
+      Number(prizes[prizenumber].amtinCart) + Number(amount);
+  }
+  totalprizesupsell();
+  submitCartThroughAjax();
+}
+function adjustAmountinPrize(element, direction) {
+
+  noajax = 0;
+  if (direction == "quickpick" || direction == "initial") {
+    direction = "text";
+    noajax = 1;
+  }
+
+  var prizenumber = element.closest(".parentdiv").attr("data-id");
+
+
+  if (prizenumber) {
+    $(".parentdiv[data-id='" + prizenumber + "']").find(".card-non-eligible").remove();
+  if (direction == "plus") {
+
+      prizes[prizenumber].amtinCart++;
+
+  } else if (direction == "minus") {
+    if (prizes[prizenumber].amtinCart != 0) {
+      prizes[prizenumber].amtinCart--;
+    }
+  } else if (direction == "text") {
+    var amount = element.val();
+    if (amount == "" || isNaN(amount) || amount <= 0 || amount > 9999) {
+      amount = 0;
+    }
+    if (!Number.isInteger(amount)) {
+      amount = Math.round(amount);
+    }
+    prizes[prizenumber].amtinCart = amount;
+  }
+
+  if (prizes[prizenumber].amtinCart == 0) {
+
+    $(".parentdiv[data-id='" + prizenumber + "']")
+        .find(".btn-update-cart").fadeOut(200, function () {
+
+      $(".parentdiv[data-id='" + prizenumber + "']")
+          .find(".btn-add-to-cart").fadeIn(200);
+    });
+
+
+    $(" .modal-cart-prize[data-id='" + prizenumber + "'] ").remove();
+  } else {
+
+if ($('#step').val() != 'cart' )  {
+    if (prizenumber == 18 || prizenumber == 24) {
+      $(".parentdiv[data-id='" + prizenumber + "']")
+          .find('.cart-buttons-outer')
+          .before(
+              `  <p class="card-text card-non-eligible"><small>Not eligible to be multiplied</small></p> `
+          );
+    }
+    }
+
+
+    //change text number
+    $(".parentdiv[data-id='" + prizenumber + "']")
+        .find("span.prize-amount input")
+        .val(prizes[prizenumber].amtinCart);
+
+    if (
+        $(".card[data-id='" + prizenumber + "']")
+            .find(".btn-add-to-cart")
+            .is(":visible")
+    ) {
+      //if this is not visible, then show everythere
+      $(".card[data-id='" + prizenumber + "'] .btn-add-to-cart").hide();
+      $(".card[data-id='" + prizenumber + "'] .btn-update-cart").show();
+    }
+  }
+
+}//end has prizenumber
+  if (noajax != 1) {
+    //don't ajax for quickpick
+    submitCartThroughAjax();
+  }
+
+  //adjust all text on page
+
+  var totalTicketsAmount = calculateTotalTickets();
+  totalTickets = totalTicketsAmount[0];
+  var totalTicketsToDouble = totalTicketsAmount[1];
+  var totalTicketsCost = totalTickets * COSTTICKET;
+
+	
+	if (LANGUAGE == 'HEB')  {
+		$(".total-dollars").text(` ₪${totalTicketsCost}`);
+	}else  {
+$(".total-dollars").text(` $${totalTicketsCost}.00`);		
+	}
+  
+  $(".amount-double-bar").text("");
+  if (totalTickets >= 20 && totalTickets < 50) {
+    var doubleamt = 2;
+    var doubleword = (LANGUAGE == 'HEB'?"זכאי להכפלה": "DOUBLED" ) ;
+
+    $(".cart-prize-total ").each(function (key) {
+      var index = $(this).closest(".parentdiv").data("id");
+      $(this).html(
+        `        <small><span class="cart-prize-doubled cart-prize-text">${doubleword}!</span>
+    <span class="cart-prize-amt"> ` +
+          doubleamt * Number(prizes[index].amtinCart) +
+          ` ${ENTRIESWORD}</span></small>`
+      );
+    });
+
+    $(".parentdiv[data-id='18'], .parentdiv[data-id='24'] ")
+      .find(".cart-prize-total")
+      .addClass("cart-prize-non-eligible")
+      .text("Not eligible to be multiplied" );
+    $(".amount-double-bar").html("<small>(x2)</small>");
+  } else if (totalTickets >= 50) {
+    var doubleamt = 3;
+
+	    var doubleword = (LANGUAGE == 'HEB'?"זכאי לשילוש": "TRIPLED" ) ;
+    $(".amount-double-bar").html("<small>(x3)</small>");
+    $(".cart-prize-total ").each(function (key) {
+      var index = $(this).closest(".parentdiv").data("id");
+      $(this).html(
+        `       <small> <span class="cart-prize-tripled cart-prize-text">${doubleword}!</span>
+        <span class="cart-prize-amt"> ` +
+          doubleamt * prizes[index].amtinCart +
+          ` ${ENTRIESWORD}</span></small>`
+      );
+    });
+
+    $(".parentdiv[data-id='18'], .parentdiv[data-id='24'] ")
+      .find(".cart-prize-total")
+        .addClass("cart-prize-non-eligible")
+      .html("<small>Not eligible to be multiplied</small>");
+  } else {
+    var doubleamt = 1;
+
+    $(".cart-prize-total").text(``);
+  }
+  var amountDouble = doubleamt * totalTicketsToDouble;
+  var amountNotDouble = totalTickets - totalTicketsToDouble;
+  var totalTicketToDisplay = amountDouble + amountNotDouble;
+
+  $(".total-tickets").text(`${totalTickets}`);
+	if (LANGUAGE == 'HEB')  {
+	html =  `${totalTicketToDisplay} ${TICKETWORD}${plurals(
+        totalTicketToDisplay )} בעגלה . `;
+}else {
+      var entrytext = (totalTicketToDisplay == 1 ? "entry" : "entries" ) ;
+	html =  `${totalTicketToDisplay} ${entrytext} in your cart. `;
+
+}
+
+  $(".cart-tickets")
+    .removeClass("DOUBLED")
+    .removeClass("TRIPLED")
+    .html(
+     html
+    );
+  if (totalTickets >= 20) {
+	  
+	  if (LANGUAGE == 'HEB')  {
+   var text = `<br><span class="doubled-fade"> ${totalTicketsToDouble} ${TICKETWORD}${plurals(
+      totalTickets,
+      1
+    )} ${doubleword}!</span>`;
+}else { 
+	   var text = `<br><span class="doubled-fade">That's ${totalTicketsToDouble} ticket${plurals(
+      totalTickets,
+      1
+    )} ${doubleword}!</span>`;
+
+}
+
+    if (amountNotDouble != 0) {
+      prizetext = "";
+      if (prizes[18].amtinCart != 0) {
+        prizetext = (LANGUAGE == 'HEB' ? "פרס 18" : "Prize 18" ) ;
+      }
+      if (prizes[24].amtinCart != 0) {
+        if (prizetext != "") {
+          prizetext +=  (LANGUAGE == 'HEB' ? "ו" :" and " ) ; ;
+        }
+        prizetext += (LANGUAGE == 'HEB' ? "פרס 24" : "Prize 24" ) ;
+      }
+
+			  if (LANGUAGE == 'HEB')  {
+      text += ` <br><span class="cart-prize-non-eligible">(${prizetext} לא ${doubleword})</span> `;
+			  }else  {
+      text += ` <br><span class="cart-prize-non-eligible">(${prizetext} cannot be ${doubleword})</span> `;
+			  }
+    }
+
+    text += `</span>`;
+
+    $(".cart-tickets")
+      .append(text)
+
+      .addClass(doubleword);
+  }
+  //upsell to double tickets
+  $(".amount-upsell").hide();
+  if (
+    totalTickets == 9 ||
+    totalTickets == 19 ||
+    totalTickets == 35 ||
+    totalTickets == 49
+  ) {
+    $(".congrats").remove();
+  }
+  if (totalTickets >= 15 && totalTickets <= 19) {
+	   var doubleword = (LANGUAGE == 'HEB'?"זכה להכפלת": "DOUBLE" ) ;
+    $(".amount-upsell")
+      .show()
+      .removeClass("triple-upsell")
+      .addClass("double-upsell");
+    $(".amount-upsell .double-text").text(doubleword);
+    var amountMore = 20 - totalTickets;
+    $(".amount-upsell .amount-tickets").text(
+      `${amountMore} more prize${plurals(amountMore, 1)}`
+    );
+  }
+  if (totalTickets >= 46 && totalTickets < 50) {
+    $(".amount-upsell")
+      .show()
+      .addClass("triple-upsell")
+      .removeClass("double-upsell");
+	  var tripleword = (LANGUAGE == 'HEB'?"זכה לשילוש": "TRIPLE" ) ;
+    $(".amount-upsell .double-text").text(tripleword);
+    var amountMore = 50 - totalTickets;
+    $(".amount-upsell .amount-tickets").text(
+      `${amountMore} more prize${plurals(amountMore, 1)}`
+    );
+  }
+
+  if (noajax != 1 && !$(".congrats").is(":visible") && direction != "minus") {
+    $(".congrats").remove();
+	   var text = (LANGUAGE == 'HEB'?"הגעת לסכום התרומה שבחרת": "You\'ve reached your chosen donation amount!" ) ;
+
+		  
+    if (
+      totalTickets == 10 &&
+      packageSelected == 10 &&
+      $("#pageName").val() == "prizes"
+    ) {
+      $(".amount-upsell ").before(
+        `<p class="congrats text-uppercase upsell-50"> ${text}</p>`
+      );
+    }
+    if (
+      totalTickets == 36 &&
+      packageSelected == 36 &&
+      $("#pageName").val() == "prizes"
+    ) {
+      $(".amount-upsell ").before(
+        `<p class="congrats text-uppercase upsell-180"> ${text}</p>`
+      );
+    }
+
+    if (totalTickets == 20) {
+      $(".amount-upsell ").before(
+        '<p class="congrats text-uppercase double-upsell cart-prize-doubled ">' + ( LANGUAGE== 'HEB' ? ' הכפלת את הערכים שלך!' :'Congrats! You\'ve doubled your entries!' ) +  '</p>'
+      );
+    }
+
+    if (totalTickets == 50) {
+      $(".amount-upsell ").before(
+        '<p class="congrats text-uppercase triple-upsell cart-prize-tripled ">' + ( LANGUAGE== 'HEB' ? ' שילוש את הערכים שלך!' :'Congrats! You\'ve tripled your entries!' ) +  ' </p>'
+      );
+    }
+    $(".congrats").fadeIn();
+    setTimeout(function () {
+      $(".congrats").fadeOut("slow", function () {
+        $(this).remove();
+      });
+    }, 32000);
+  }
+  changeUpsellText(totalTickets);
+  if ($("#cartModal").hasClass("show")) {
+    $("cart-prize-total").each(function (index) {
+      var currentticket = $(this).closest(".parentdiv").data("id");
+      if (isNaN(currentticket)) {
+        return true;
+      }
+      var currentamt = prizes[currentticket].amtinCart;
+      if (totalTickets >= 20) {
+        var newamt = Number(currentamt) * doubleamt;
+        $(this)
+          .find(".cart-prize-amt")
+          .text(newamt + ` ${ENTRIESWORD}` + plurals(newamt, 1));
+      } //if needs to be more than doubled
+      else {
+        $(this).find(".cart-prize-amt").text("");
+      }
+    });
+  }
+
+  if (totalTickets == 0) {
+    $("#cartModal").offcanvas("hide");
+	      var empty = (LANGUAGE == 'HEB'?"<h4 class='text-center'>העגלה שלך ריקה</h4>": `            <h4 class="empty-cart text-light text-center mt-5 pt-5">Your Cart is Empty </h4>
+            <div class="w-100 text-center my-5 pb-5"><a class="btn btn-primary" href="/#shop">Shop 50 Awesome $5 Prizes!</a></div>` ) ;
+    $("#cart-wrapper").empty().html(empty);
+
+    $(".empty-cart").show();
+    $('#form1 .progresses').hide()
+    $('.clearcart').parent().hide();
+  } else  {
+      $('.clearcart').parent().show();
+  }
+  if (prizenumber) {
+
+    if (prizes[prizenumber].amtinCart == 0  &&    $(".ticket-words").text() !=  "All prizes removed from cart.") {
+      var text = (LANGUAGE == 'HEB' ? "הסר מעגלת הקניות" : "removed from cart");
+
+      $(".ticket-words").text(`
+    ${prizes[prizenumber].name} ${text}.`);
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(fadeOutAndIn, 3000);
+
+    } else {
+      var text = (LANGUAGE == 'HEB' ? `${prizes[prizenumber].amtinCart} ${TICKETWORD}${plurals(
+          prizes[prizenumber].amtinCart,
+          1
+      )}   ${prizes[prizenumber].name}` : `${prizes[prizenumber].amtinCart} ticket${plurals(
+          prizes[prizenumber].amtinCart,
+          1
+      )}  in ${prizes[prizenumber].name}`);
+
+      $(".ticket-words").text((LANGUAGE == 'HEB' ? 'בסל' : "In cart: ") + text);
+
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(fadeOutAndIn, 3000);
+
+
+
+      /*end fade*/
+
+    }
+  }
+
+if ($('#amtupsold').val() != '') {
+var currentUpsoldMore = Number($('#additionalUpsoldSelected').val()) ;
+  $('#additionalUpsoldSelected').val(currentUpsoldMore + 1);
+  totalprizesupsell();
+}
+
+  adjustSlider(totalTickets);
+}
+const fadeOutAndIn = function() {
+  $(".ticket-words").fadeOut(500, function() {
+    var doubletext ='';
+    if (totalTickets >=20  && totalTickets < 50) {
+     doubletext ='(x2)';
+   } else if (totalTickets >= 50 )  {
+      doubletext = '(x3)';
+    }
+if (totalTickets> 0 ) {
+  $(this).text(LANGUAGE == 'HEB' ? ` סה"כ כרטיסים בעגלה: ${totalTickets} ${doubletext}` : `Total tickets in cart: ${totalTickets} ${doubletext}`).fadeIn(500);
+} else {
+  $(this).text(LANGUAGE == 'HEB' ? ` All prizes removed from cart.` : `All prizes removed from cart.`).fadeIn(500);
+  setTimeout(function () {
+    $(".ticket-words").fadeOut("slow", function () {
+       $(this).text('Your cart is empty. Add some prizes!').show();
+    });
+  }, 8000);
+}
+
+    // Reset the timeout
+  //  timeoutId = setTimeout(fadeOutAndIn, 3000);
+  });
+};
+
+function adjustSlider(totalTickets) {
+  if ( packageSelected % 1 != 0) {
+    return false
+
+  }
+
+  $(".progress-step-50 .progress-line-2").hide();
+if (packageSelected != 10)  {
+  $(".progress-10").css("width",  "0%").css('left',0).show();
+
+}
+  if (packageSelected < 20) {
+    widthToUse = totalTickets <=packageSelected ? totalTickets * 2 : packageSelected *2;
+    $(".progress-10").css("width", widthToUse + "%").css('left',0).show();
+  }
+  if ((packageSelected == 36) ) {
+    widthToUse = totalTickets < 36 ? (totalTickets - 20) * 2 : 32;
+    $(".progress-10").css("width",  "0%").css('left',0).show();
+    $(".progress-36").css("width", widthToUse + "%");
+  }
+
+  if ( packageSelected > 20 &&  packageSelected != 36 && packageSelected <50) {
+    widthToUse = totalTickets <=packageSelected ? (totalTickets-20) * 2 : (packageSelected-20) *2;
+    $(".progress-10").css("width", widthToUse + "%").css('left','40%').show();
+  }
+  var packageToDivide = packageSelected && packageSelected >50 ? packageSelected : 50;
+
+
+  const percentage = (20 / packageToDivide) * 100 /20;
+  if (totalTickets >= 0 && totalTickets <= 20) {
+    //packageSelected / 50
+    $(".progress-20").css("width", percentage *totalTickets + "%");
+    $(".progress-50, .progress-custom").css("width", "0%");
+  }
+  const twentyPercentage = percentage * 20;
+  const fiftyPercentage = percentage * 50;
+  if (totalTickets > 20 ) {
+
+    $(".progress-20").css("width",(percentage *20) + '%' );
+    widthToUse = totalTickets < 50 ? ( ( percentage* totalTickets ) - twentyPercentage)  : fiftyPercentage;
+
+    $(".progress-50").css("width", widthToUse + "%");
+  }
+  if (totalTickets < 50 && packageSelected > 50) {
+    $(".progress-custom").css("width", "0%")
+    $(".progress-step-50 .progress-line-2").show();
+  }
+  if (totalTickets >= 50 && packageSelected > 50) {
+      $(".progress-50").css("width",(percentage*30 ) + '%' );
+    widthToUse = ( percentage* totalTickets ) - fiftyPercentage  ;
+    $(".progress-custom").css("width", widthToUse + "%");
+  }
+  if (totalTickets == 0) {
+    $(".progress-20").css("width", "0%");
+  }
+
+
+  return true;
+}
+function setModalInformation(element) {
+  var prizenumber = element.data("id");
+  pushToGAViewProduct(prizenumber);
+  $('#prizeModal .card-non-eligible small').remove();
+  $("#prizeModal").attr("data-id", prizenumber);
+  $("#prizeModal .modal-prize-name ").text(element.find(".prize-name").text());
+  $("#prizeModal .modal-prize-description").text(
+    element.find(".description").text()
+  );
+
+  if (element.find(".sponsor").text() != "") {
+    $("#prizeModal .modal-prize-sponsor span").html(
+      "Sponsored by: " + element.find(".sponsor").text()
+    );
+  } else {
+    $("#prizeModal .modal-prize-sponsor span").text("");
+  }
+
+  if (prizes[prizenumber].amtinCart > 0) {
+    $("#prizeModal .btn-update-cart span input").val(
+      prizes[prizenumber].amtinCart
+    );
+    $("#prizeModal .btn-add-to-cart").hide();
+    $("#prizeModal .btn-update-cart").show();
+  } else {
+    $("#prizeModal .btn-update-cart span input").val(1);
+    $("#prizeModal .btn-add-to-cart").show();
+    $("#prizeModal .btn-update-cart").hide();
+  }
+  $(" #prizeModal .modal-prize-integer").text(prizenumber);
+  $(" #prizeModal .modal-prize-value").text(
+    element.find(".prize-value").text()
+  );
+	
+	
+  $(".modal-prize-img").css(
+      "background-image",
+      'url("/img/lg/' + prizenumber + '.jpg")'
+  );
+
+
+
+
+  $("#prize-range-slider").val(prizenumber);
+  newValue = Number(((prizenumber - 0) * 100) / (50 - 0));
+  newPosition = 10 - Number(newValue * 0.2);
+  newPosition = 0;
+
+  $("#rangeV")
+    .html(`<span>${prizenumber}</span>`)
+    .css("left", `calc(${newValue-1}% + (${newPosition}px))`);
+
+  return true;
+}
+function changeUpsellText(totalTickets) {
+  var upselltickets; // min amount of tickets to show the message
+  var upselltext;
+  var hebrewupsell;
+  $(".upsell-link").hide();
+
+  //find next amount
+  //if (totalTickets < 4) {
+
+  var upselllist = {
+    1: {
+      tickets: 100,
+      text: "a Sukkah for an Oorah family",
+    },
+    2: {
+      tickets: 50,
+      text: "a tuition bonus for learning with a TorahMate",
+    },
+
+    3: {
+      tickets: 46,
+      text: "a couple to join a ShabbaZone",
+    },
+
+    4: {
+      tickets: 42,
+      text: "a pizza party at ChillZone",
+    },
+    5: {
+      tickets: 38,
+      text: "a family to attend the Oorah Purim Seuda",
+    },
+    6: {
+      tickets: 34,
+      text: "Yom Tov at TheZone for an individual",
+    },
+
+    7: {
+      tickets: 30,
+      text: "a monthly stipend for a boy or girl learning in E”Y",
+    },
+
+    8: {
+      tickets: 27,
+      text: " a Yom Tov project for Little Star Preschool",
+    },
+    9: {
+      tickets: 23,
+      text: "a day of Cocoa Club learning",
+    },
+    10: {
+      tickets: 20,
+      text: "3 ChillZone prizes",
+    },
+    11: {
+      tickets: 17,
+      text: "yarmulkes for a bunk in TheZone",
+    },
+    12: {
+      tickets: 15,
+      text: "a Shabbos Auction prize for a camper",
+    },
+    13: {
+      tickets: 12,
+      text: "Daled Minim for an Oorah family",
+    },
+    14: {
+      tickets: 10,
+      text: "a holiday package for an Oorah family",
+    },
+    15: {
+      tickets: 7,
+      text: "seforim for a TorahMates partnership",
+    },
+    16: {
+      tickets: 4,
+      text: "tzitzis for a Zone camper",
+    },
+  };
+
+  Object.entries(upselllist).map(([key, value]) => {
+    if (totalTickets < value.tickets) {
+      upselltickets = value.tickets;
+      upselltext = value.text;
+    }
+  });
+
+  if (upselltext && totalTickets < 500 && $("#upsold").val() != 1) {
+    var amtExtraNeeded = upselltickets - totalTickets;
+
+      $(".amt-upsell-tickets").html(
+        amtExtraNeeded + " prize" + plurals(amtExtraNeeded, 1)
+      );
+  $(".amt-upsell-tickets:first").html(
+        amtExtraNeeded + " more prize" + plurals(amtExtraNeeded, 1)
+      );
+
+      if (amtExtraNeeded <=4 && totalTickets != 0 ) {
+        $(".upsell-text").html(upselltext);
+        $(".kiruv-upsell").show();
+      } else {
+       $(".kiruv-upsell").hide();
+      }
+  } else {
+    $(".kiruv-upsell").hide();
+  }
+}
+function pushToGAAddToCart(element) {
+  var prizenumber = element.closest(".parentdiv").attr("data-id");
+  if (prizenumber) {
+
+    dataLayer.push({
+
+      event: "add_to_cart",
+      ecommerce: {
+        currency: "USD",
+        value: prizes[prizenumber].amtinCart *5,
+        items: [
+          {
+            item_id: "p"+ prizenumber,
+            item_name: prizes[prizenumber].name,
+            item_category: "Prizes",
+            price: 5,
+            quantity: prizes[prizenumber].amtinCart
+          }
+        ]
+      }
+    });
+
+
+
+  }
+}
+function pushToGAViewProduct(prizenumber) {
+
+  if (prizenumber) {
+    dataLayer.push({
+      event: "view_item",
+      ecommerce: {
+        currency: "USD",
+        value: prizes[prizenumber].amtinCart *5,
+        items: [
+          {
+            item_id: "p"+ prizenumber,
+            item_name: prizes[prizenumber].name,
+            item_category: "Prizes",
+            price: 5,
+            quantity: 1
+          }
+        ]
+      }
+    });
+  }
+}
+$(document).ready(function () {
+  //reset prizes on page load
+
+  if ($("#pageName").val() == "prizes") {
+    Object.entries(prizes).map(([key, value]) => {
+      if (value.amtinCart > 0) {
+        $('.parentdiv[data-id="' + key + '"]')
+          .find(".btn-update-cart input")
+          .val(value.amtinCart);
+        adjustAmountinPrize(
+          $('.parentdiv[data-id="' + key + '"]').find(".btn-update-cart input"),
+          "initial"
+        );
+      }
+    });
+
+    var totalTickets = calculateTotalTickets();
+    totalTickets = totalTickets[0];
+     var html = '';
+    if (totalTickets != 0) {
+
+      if (LANGUAGE == 'HEB') {
+        html = `₪${totalTickets} ${TICKETWORD}${plurals(totalTickets, 1)} בעגלה. `;
+      } else {
+        // html =   `${totalTickets} ticket${plurals(totalTickets, 1)} <br>in your cart.`;
+        html = '';
+
+
+      }
+    } else  {
+      html = 'Your cart is empty. Add some prizes!';
+    }
+      $(".ticket-words").html(      html      );
+
+
+
+  } // end load on prizes page
+  if ($("#MM_insert").val() == "form1") {
+	changeUpsellText($(".total-tickets:first").text());
+	} //end checkout page
+
+  $(".btn-add-to-cart").click(function () {
+    var prizenumber = $(this).closest(".parentdiv").attr("data-id");
+    addEmoji($(this));
+
+    $(this).fadeOut(200, function() {
+
+      $(this).next().fadeIn(200);
+    });
+
+
+    adjustAmountinPrize($(this), "plus");
+
+    pushToGAAddToCart($(this));
+  });
+
+  $("body").on("click", ".btn-plus", function () {
+    adjustAmountinPrize($(this), "plus");
+    pushToGAAddToCart($(this));
+    addEmoji($(this));
+  });
+  $("body").on("click", ".btn-minus", function () {
+    adjustAmountinPrize($(this), "minus");
+    pushToGAAddToCart($(this));
+  });
+
+  $("body").on("change", ".btn-update-cart input", function () {
+    adjustAmountinPrize($(this), "text");
+    pushToGAAddToCart($(this));
+  });
+  //treat buttons differently in modal upsell box
+
+  $("#modalUpsell").on("click", ".btn-plus", function () {
+    adjustAmountinPrizeUpsell($(this), "plus");
+  });
+  $("#modalUpsell").on("click", ".btn-minus", function () {
+    adjustAmountinPrizeUpsell($(this), "minus");
+  });
+
+  $("#modalUpsell").on("change", ".btn-update-cart input", function () {
+    adjustAmountinPrizeUpsell($(this), "text");
+  });
+
+  $(".open-modal").click(function (e) {
+    //if width < 767 return false
+  
+    if ($(window).width() <= 767) {
+      e.preventDefault();
+        return false;
+    }
+    var element = $(this).closest(".card");
+
+
+
+    setModalInformation(element);
+
+    $("#prizeModal").modal("show");
+    $(".modal-backdrop").addClass("prize-modal-backdrop");
+  });
+
+
+
+  $(".btn-next, .btn-previous").click(function () {
+
+    var prizenumber = $(this).closest(".parentdiv").attr("data-id");
+
+    if ($(this).hasClass("btn-next")) {
+      var nextprize = Number(prizenumber) + 1;
+      if (nextprize == 51) {
+        nextprize = 1;
+      }
+    } else {
+      var nextprize = Number(prizenumber) - 1;
+      if (nextprize == 0) {
+        nextprize = 50;
+      }
+    }
+    element = $(".card[data-id='" + nextprize + "']");
+    setModalInformation(element);
+  });
+
+  $(document).keydown(function (event) {
+    if ($("#prizeModal").hasClass("show")) {
+      var keycode = event.keyCode ? event.keyCode : event.which;
+
+      if (keycode === 39) {
+        $("#prizeModal .btn-next").trigger("click");
+      }
+      if (keycode === 37) {
+        $("#prizeModal .btn-previous").trigger("click");
+      }
+    }
+  });
+$('.scroller__inner .skew, #prize-review-slide .swiper-slide').click(function() {
+  var id = $(this).data("id");
+  $('html,body').unbind().animate({scrollTop: $('.card[data-id="' + id + '"]').offset().top-150},'slow');
+  setTimeout(function () {
+    $(".card[data-id='" +  id + "'] .open-modal").trigger("click");
+  }, 2000);
+
+
+});
+  $("#prize-range-slider").on("input", function () {
+    var prizenumber = Number(this.value);
+    element = $(".card[data-id='" + prizenumber + "']");
+    setModalInformation(element);
+  });
+  $(".cart a").click(function () {
+    if ($("body").attr("id") == "checkout-page") {
+      // returnToStepOne();
+      return true;
+    }
+
+    $(".cart-prizes-outer").empty();
+    var totalTickets = calculateTotalTickets();
+    totalTickets = totalTickets[0];
+    var totalTicketsCost = totalTickets * COSTTICKET;
+	  		if (LANGUAGE == 'HEB')  {
+	
+				$(".total-dollars").text(` ₪${totalTicketsCost}`);
+			}else { 
+    $(".total-dollars").text(` $${totalTicketsCost}.00`);
+			}
+    if (totalTickets == 0) {
+      $(".empty-cart").show();
+      $('#form1 .progresses').hide()
+
+      $(".modal-footer").hide();
+    } else {
+      $(".empty-cart").hide();
+      $(".modal-footer, .cart-checkout").show();
+    }
+
+    changeUpsellText(totalTickets);
+    var doubletext ="";
+    var doubleamt = "";
+    var csstext = "";
+    Object.entries(prizes).map(([key, value]) => {
+      if (value.amtinCart > 0) {
+
+        var html = $(".modal-cart-sample").html();
+        html = html.replace(/#prizename#/g, value.name);
+        html = html.replace(/#key#/g, key);
+
+        html = html.replace(/#amtinprize#/g, value.amtinCart);
+        html = html.replace(/#imgbk#/g, "/img/sm/" + key + ".jpg");
+
+      //find .prize-cards where data-id = key
+        let prizediv = $(".prize-cards").find(`[data-id='${key}']`);
+       valueformatted=  prizediv.find(".prize-value").text();
+
+
+        html = html.replace(/#value#/g, valueformatted);
+        if (totalTickets >= 20 && totalTickets < 50) {
+			    doubletext = (LANGUAGE == 'HEB'?"כפול!": "DOUBLED!" ) ;
+   
+          csstext = `doubled`;
+          doubleamt = value.amtinCart * 2;
+        }
+        if (totalTickets >= 50) {
+     
+			    doubletext = (LANGUAGE == 'HEB'?"שילוש!": "TRIPLED!" ) ;
+          csstext = `tripled`;
+          doubleamt = value.amtinCart * 3;
+        }
+
+        doubletextamt =
+          totalTickets >= 20
+            ? doubleamt + " " + ENTRIESWORD
+            : "";
+
+        if (key != 18 && key != 24) {
+		
+          html = html.replace(
+            /#doublesection#/g,
+            ' <p class="cart-prize-total"><small><span class="cart-prize-' +
+              csstext +
+              ' cart-prize-text" >' +
+              doubletext +
+              "</span><span   class='cart-prize-amt'> " +
+              doubletextamt +
+              "<span></small></p>"
+          );
+        } else {
+          html = html.replace(
+            /#doublesection#/g,
+            ' <p class="cart-prize-total"><small><span class="cart-prize-non-eligible cart-prize-' +
+              csstext +
+              ' cart-prize-text" >Not eligible to be multiplied</span></small></p>'
+          );
+        }
+        $(".cart-prizes-outer").append($(html).removeClass("sample"));
+      }
+    });
+
+    if (   $("#cartModal .parentdiv:visible").length < 5    )
+    {
+      $("#cartModal .clearcart:first").hide();
+    } else {$("#cartModal .clearcart:first").show();}
+if (totalTickets > 0 ) {
+  $('.cart-add-info').show();
+}
+    $("#cartModal").offcanvas("show");
+  });
+  $("body").on("click", ".kiruv-upsell-link", function () {
+    $(".kiruv-upsell-link").closest("div").hide();
+    $("#upsold").val("1");
+
+    var amttoupsell = $('.amt-upsell-tickets').text();
+    var number = amttoupsell.match(/\d+/)[0];
+    $('#amtupsold').val(number);
+
+  });
+
+  $(".btn-checkout").click(function (e) {
+
+    if ($("#pageName").val() == "prizes" && packageSelected != 0) {
+      var amtLeft = Number(packageSelected) - Number($(".total-tickets:first").text());
+      if (amtLeft > 0) {
+        e.preventDefault();
+        //round up number
+
+        $("#modalB4Checkout .checking-out-number").html(
+
+            "&nbsp" +  Math.ceil(amtLeft) + "&nbsp ticket" + plurals(packageSelected) + "&nbsp"      );
+        var packagetoWrite = LANGUAGE == 'HEB' ? "" : "$" +packageSelected *5;
+        // var packagetoWrite = "$"  +packageSelected *5;
+       /* if (packageSelected == 20) {
+       packagetoWrite = (LANGUAGE == 'HEB'?"להכפלת כרטיסים! ": " double entries");
+        }
+        if (packageSelected == 50) {
+          packagetoWrite = (LANGUAGE == 'HEB'?"לשילוש כרטיסים! ": " triple entries");
+        }*/
+        $("#modalB4Checkout .checking-out-message").html(packagetoWrite);
+        $("#modalB4Checkout").modal("show");
+      }
+    }
+  });
+
+  $('#modalB4Checkout #btn-more').click(function(){
+    $('#cartModal').offcanvas('hide');
+  });
+
+  $(".packsBx").click(function (e) {
+    if ($(this).closest("#prize-selection").length == 0) {
+      window.location = "/";
+    }
+  });
+
+  $(".clearcart").click(function (e) {
+    e.preventDefault();
+    $('#modalClearCart').modal('show');
+  });
+
+    $('#btn-clear-cart').click(function() {
+
+      Object.entries(prizes).map(([key, value]) => {
+        value.amtinCart = 0;
+        if ($("#pageName").val() == "prizes") {
+          $('.parentdiv[data-id="' + key + '"]')
+              .find(".btn-update-cart input")
+              .val(0);
+           if(  $('.parentdiv[data-id="' + key + '"]').find(
+               ".btn-update-cart input").is(":visible")  ) {
+             adjustAmountinPrize(
+                 $('.parentdiv[data-id="' + key + '"]').find(
+                     ".btn-update-cart input"
+                 ),
+                 "initial"
+             );
+           }
+        }
+      });
+  
+
+      submitCartThroughAjax();
+      $(".ticket-words").text( LANGUAGE== 'HEB' ? 'נקה סל': "All prizes removed from cart.");
+
+   
+      if ($("#pageName").val()!= "prizes") {
+
+      $(".total-tickets, .total-dollars").html(0);
+      $(" .cart-tickets").html('');
+		$('.upsell-text').hide();
+		$('.cart-prizes-outer').empty();
+      //for checkout page
+     
+      //  for other pages
+      $(" .cart-prizes-outer").html(
+        '<div class="col-md-10">  <p id="noneincart"> All items have been removed from your cart</p><br><p data-bs-dismiss="modal" aria-label="Close">Close Cart</p></div>'
+      );
+
+		  $('#cartModal').offcanvas('hide');
+
+      }
+
+
+      $('.cart-add-info, .kiruv-upsell, .cart-checkout').hide();
+
+      $('#modalClearCart').modal('hide');
+  }); //end clear cart
+}); //document ready
+
+
+// in cart : 1 ticket in  Israel
+
+
+
+function totalprizesupsell() {
+
+  var totalupsell = 0;
+
+  $("#modalUpsell .prize-amount input").each(function (index) {
+    totalupsell += Number($(this).val());
+  });
+  // if $('#additionalUpsoldSelected').val() is not undefined
+  if (typeof $('#additionalUpsoldSelected').val() !== 'undefined') {
+  totalupsell = Number($('#additionalUpsoldSelected').val());
+}
+
+  if (totalupsell > 0) {
+    var str = $(".amount-tickets").text();
+    if (str) {
+      var matches = str.match(/(\d+)/);
+      var amtToUpsell = matches[0];
+    } else {
+      var amtToUpsell = $(".amt-upsell-tickets").html();
+    }
+
+    var amtToUpsellNumber ;
+    if (amtToUpsell.includes(" ")) {
+      amtToUpsellNumber = Number( amtToUpsell.split(" ")[0]);
+    } else {
+      amtToUpsellNumber = amtToUpsell;
+    }
+
+      if (typeof $('#amtupsold').val() !== 'undefined') {
+      amtToUpsellNumber = Number($('#amtupsold').val());
+    }
+    var htmlBefore = ($('#additionalUpsoldSelected').val() != ''? 'Additional ' : '');
+     html = htmlBefore + "Tickets chosen: " + totalupsell + "/" + amtToUpsellNumber;
+    if (totalupsell == amtToUpsellNumber) {
+      $('#select-additional').text('Thank you for your support!');
+      //fade it out
+
+
+    }
+    if (totalupsell > amtToUpsellNumber) {
+      html = htmlBefore + "Tickets chosen: " + totalupsell ;
+
+    }
+
+    $(".counter").html(html);
+    $(".addTocartUpsell").show();
+    /*if (typeof $('#additionalUpsoldSelected').val() !== 'undefined') {
+      setTimeout(function () {
+        $('#select-additional, .counter').fadeOut('hide');
+      }, 10000);
+    }*/
+  } else {
+    $(".counter").html("");
+    $(".addTocartUpsell").hide();
+  }
+}

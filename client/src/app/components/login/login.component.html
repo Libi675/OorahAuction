@@ -1,0 +1,40 @@
+<!--  -->
+  <body>
+<form #frm="ngForm" class="example-form">
+  <br />
+  <h3>Login</h3>
+
+  <div class="row form-group email">
+    <div class="col col-4">
+      <mat-form-field class="example-full-width control-label">
+        <input matInput [(ngModel)]="user.email" [formControl]="mailFormControl" class="form-control" name="email" 
+          placeholder="Enter email" required>
+        
+        <!-- הצגת הודעות שגיאה -->
+        <mat-error *ngIf="mailFormControl.hasError('required')">Email is required</mat-error>
+        <mat-error *ngIf="mailFormControl.hasError('email') && !mailFormControl.hasError('required')">
+          Email is not valid
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="col col-4">
+    <mat-form-field class="example-full-width control-label">
+      <input type="password" [(ngModel)]="user.password" matInput [formControl]="passwordFormControl" placeholder="Enter password"
+        class="form-control" name="password">
+      
+      <!-- הצגת הודעות שגיאה -->
+      <mat-error *ngIf="passwordFormControl.hasError('required')">Password is required</mat-error>
+      <mat-error *ngIf="passwordFormControl.hasError('minlength') && !passwordFormControl.hasError('required')">
+        Password must be between 5-15 characters
+      </mat-error>
+    </mat-form-field>
+  </div>
+
+  <!-- כפתור מאופשר רק אם הטופס תקני -->
+  <button mat-button [disabled]="frm.invalid" (click)="login(user)">
+    <mat-icon>login</mat-icon> Connect
+  </button>
+</form>
+</body>

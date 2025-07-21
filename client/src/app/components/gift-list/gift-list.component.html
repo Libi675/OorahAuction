@@ -1,0 +1,128 @@
+<!-- אפשרות ללחצן הוספה -->
+ <body>
+ <div class="btn_gift">
+<div class="search-container">
+  <input type="text" #searchInput (input)="search(searchInput.value)" placeholder=" enter a name of gift" class="search-input" >
+  <button mat-icon-button type="submit" (click)="search(searchInput.value)" class="search-button">
+    <mat-icon>search</mat-icon>
+  </button>
+</div>
+<!-- <div *ngIf="giftToUpdate==null"> -->
+ 
+
+  <button  class="btngift" (click)="getProfit(true)"><mat-icon>touch_app</mat-icon>
+    <mat-icon>add</mat-icon>
+   
+  </button>
+  <div *ngIf="flagProfit"> this is the profits untill to: <p>{{ today | date }}</p> is: {{this.sum}}$ <button  (click)="closeProfit()">
+    <mat-icon>close</mat-icon>
+  </button>
+ 
+
+</div>
+<!-- </div> -->
+
+<!-- //אם flag תביא לי קומק של הוספה -->
+<div *ngIf="flag">
+  <app-add-gift (giftAdd)="onGiftAdded($event)"></app-add-gift>
+</div>
+
+<!-- <button (click)="navigateUpdate(1)">Ruffle</button> -->
+
+<button   class="btngift" (click)="sortGift()"><mat-icon>sort</mat-icon>
+  <!-- <button    (click)="closeSort()"></button> -->
+</button>
+
+<button class="btngift" (click)="navigateGift()">
+  <mat-icon>add</mat-icon>
+</button>
+
+</div>
+<table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+ 
+  <ng-container matColumnDef="position">
+    <th mat-header-cell *matHeaderCellDef> Gift code </th>
+    <td mat-cell *matCellDef="let element"> {{element.giftId}} </td>
+    <button mat-raised-button>Add
+
+    </button>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef>Gift name </th>
+    <td mat-cell *matCellDef="let element"> {{element.giftName}} </td>
+  </ng-container>
+
+  <!-- price Column -->
+  <ng-container matColumnDef="weight">
+    <th mat-header-cell *matHeaderCellDef> Ticket Price</th>
+    <td mat-cell *matCellDef="let element"> {{element.ticketPrice}} </td>
+  </ng-container>
+
+  <!-- donor Column -->
+  <ng-container matColumnDef="symbol">
+    <th mat-header-cell *matHeaderCellDef> Donor name </th>
+    <td mat-cell *matCellDef="let element">{{element.donorNameGift}}</td>
+  </ng-container>
+  
+  <!-- element.donorNaneGift -->
+  <ng-container matColumnDef="img">
+    <th mat-header-cell *matHeaderCellDef> Image </th>
+    <td mat-cell *matCellDef="let element"><img class="imgGift" src='images/{{element.image}}' ></td>
+  </ng-container>
+ <!-- donor Column -->
+ <ng-container matColumnDef="cat">
+  <th mat-header-cell *matHeaderCellDef> Category</th>
+  <td mat-cell *matCellDef="let element">{{element.categoryName}}</td>
+</ng-container>
+<!-- 'winner' Column -->
+<ng-container matColumnDef="winner">
+  <th mat-header-cell *matHeaderCellDef>  </th>
+  <td mat-cell *matCellDef="let element">
+ 
+
+  <div *ngIf="winners[element.giftId]; else raffleButton">
+    The winner:
+   {{ winners[element.giftId] }}
+  </div>
+  <ng-template #raffleButton>
+    <button mat-fab aria-label="Example icon button with a delete icon"  (click)="ruffle(element.giftId)">
+     <mat-icon>card_giftcard</mat-icon>
+    </button>
+    <button mat-fab aria-label="Example icon button with a delete icon" (click)="deleteG(element.giftId)">
+      <mat-icon>delete</mat-icon>
+    </button>
+    <!-- <button mat-button (click)="openDialog(element)"> <mat-icon>update</mat-icon></button> -->
+
+    <button mat-fab aria-label="Example icon button with a delete icon" (click)="editGift(element)">
+      <mat-icon>update</mat-icon>
+    </button>
+  </ng-template>
+  <td mat-cell *matCellDef="let element">{{element.categoryaId}}</td>
+</ng-container>
+  <!-- btn Column -->
+  <ng-container matColumnDef="btn">
+    <th mat-header-cell *matHeaderCellDef> </th>
+    <td mat-cell *matCellDef="let element">
+      <div class="example-flex-container">
+        <div class="example-button-container">
+
+         
+
+          <!-- <button mat-fab aria-label="Example icon button with a delete icon" (click)="ruffle(element.giftId)">
+            <mat-icon>add</mat-icon>
+          </button>
+         -->
+        </div>
+      </div>
+    </td>
+  </ng-container>
+
+  
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+ </body>
+

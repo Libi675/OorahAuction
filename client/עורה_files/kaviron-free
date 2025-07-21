@@ -1,0 +1,8 @@
+@font-face {
+    font-family: 'Kaviron Free';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Kaviron Free'), url('https://fonts.cdnfonts.com/s/103511/kaviron-free.woff') format('woff');
+}
+
+

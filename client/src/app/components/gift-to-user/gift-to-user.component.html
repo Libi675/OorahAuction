@@ -1,0 +1,31 @@
+
+
+
+
+<body>
+
+<div class="contain">
+@for(element of giftListDB;track element){
+<mat-card class="example-card" appearance="outlined">
+    
+    <img mat-card-image src='images/{{element.image}}' >
+    <mat-card-content>
+     
+    </mat-card-content>
+    <div *ngIf="prm==0">
+    <mat-card-actions>
+    
+      <button  mat-fab aria-label="Example icon button with a delete icon"(click)="addToCart(element.giftId)"><mat-icon>add_shopping_cart</mat-icon></button>
+      <mat-card-header>
+        <div mat-card-avatar class="example-header-image"></div>
+        <mat-card-title>{{element.giftName}}</mat-card-title>
+        <br>
+        <mat-card-subtitle>{{element.ticketPrice}}$</mat-card-subtitle>
+      </mat-card-header>
+      <!-- <button mat-button>SHARE</button> -->
+    </mat-card-actions>
+  </div>
+  </mat-card>
+}
+</div>
+</body>

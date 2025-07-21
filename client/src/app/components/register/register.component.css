@@ -1,0 +1,104 @@
+/* גוף הדף */
+body {
+    background-color: #001f3d; /* כחול כהה מאוד */
+    font-family: 'Roboto', sans-serif;
+    height: 100vh; /* דף בגובה מלא */
+    margin: 0;
+    display: flex; /* Flexbox למרכז את התוכן */
+    justify-content: center; /* למרכז את התוכן אופקית */
+    align-items: center; /* למרכז את התוכן אנכית */
+}
+
+/* טופס ההתחברות */
+.example-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px; /* צמצום הרווחים */
+    background-color: #cbcfd5cc;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* צללים עמוקים יותר */
+    max-width: 320px; /* הגבלת רוחב הטופס */
+    backdrop-filter: blur(10px); /* טשטוש רקע חזק יותר */
+    text-align: center;
+    opacity: 0.9; /* שקיפות קלה לטופס */
+}
+content{
+    padding:  0;
+    margin: 0;
+}
+
+/* כותרת טופס */
+h3 {
+    color: #ffffff; /* לבן לניגודיות גבוהה */
+    font-size: 1.4rem; /* הקטנת גודל הטקסט */
+    margin-bottom: 15px; /* צמצום הרווח התחתון */
+}
+
+/* עיצוב שדות הטופס */
+.mat-form-field {
+    width: 100%; /* שדות הטופס יתפשו את כל הרוחב */
+    margin-bottom: 12px; /* צמצום הרווח בין השדות */
+}
+
+.mat-form-field .mat-input-element {
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.5); /* גבול בהיר ועדין */
+    background-color: rgba(0, 0, 0, 0.2); /* רקע כהה בשדות */
+    font-size: 0.9rem; /* הקטנת גודל הטקסט */
+    padding: 8px; /* צמצום מרווח בתוך השדה */
+}
+
+.mat-form-field input.mat-input-element:focus {
+    border-color: #FF4D4D; /* אדום בהיר כשיש פוקוס */
+    box-shadow: 0 0 5px rgba(255, 77, 77, 0.7); /* הילה עדינה באדום */
+}
+
+/* טקסט שגיאה (אם יש) */
+div  {
+    color: #FF4D4D; /* אדום עדין לשגיאות */
+    font-size: 0.8rem; /* הקטנת גודל הטקסט לשגיאות */
+    margin-top: 5px;
+}
+
+/* כפתור התחברות */
+button {
+    background-color: #FF4D4D; /* אדום בהיר לכפתור */
+    color: #fff;
+    border-radius: 4px;
+    margin-top: 15px; /* צמצום רווח למעלה */
+    padding: 10px 18px; /* צמצום רווח פנימי */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    font-size: 0.9rem; /* הקטנת גודל הטקסט בכפתור */
+}
+
+button mat-icon {
+    margin-right: 8px;
+}
+
+button:hover {
+    background-color: #e03a3a; /* אדום כהה יותר בזמן ריחוף */
+    transform: scale(1.05); /* הגדלה קלה בזמן ריחוף */
+}
+
+/* עיצוב מותאם למובייל */
+@media (max-width: 600px) {
+    .example-form {
+        width: 80%;
+    }
+
+    h3 {
+        font-size: 1.2rem; /* גודל טקסט קטן יותר */
+    }
+
+    button {
+        padding: 12px;
+    }
+}

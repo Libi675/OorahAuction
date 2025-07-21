@@ -1,0 +1,386 @@
+if (typeof packageSelected == "undefined") {
+
+    var packageSelected = "0";
+} else  {
+    var standardBreakPoints = ["10","20","36","50"];
+    $('#custom-entries').html('');
+    $('.progress-step-custom .progress-step-chosen,  .progress-step-custom').hide();
+
+    if (packageSelected> 50 ||  standardBreakPoints.includes(packageSelected) == false) {
+        resetProgress(packageSelected, "EN");
+    }
+    if (packageSelected == "36" ) {
+        $('.progress-step-36 .progress-step-chosen,  .progress-step-36').show();
+    } else {
+        $('.progress-step-36 .progress-step-chosen,  .progress-step-36').hide();
+
+    }
+    if (packageSelected != "10" ) {
+        $('.progress-step-10').hide();
+
+    }
+
+}
+
+$(window).scroll(function(event) {
+    function footer()
+    {
+        var scroll = $(window).scrollTop();
+        var footerheight = $('footer').innerHeight();
+        if(scroll > 500 && scroll < $(document).height() - $(window).height() - footerheight)
+        {
+            //if width <= 767
+            if ($(window).width() <= 767) {
+                $("#bottom-mobile-bar").fadeIn("slow").addClass('d-block');
+            } else {
+                $("#bottom-desktop-bar").fadeIn("slow").addClass('d-md-block');
+            }
+
+        }
+        else
+        {
+            if ($(window).width() <= 767) {
+                $("#bottom-mobile-bar").fadeOut("slow").removeClass('d-block');
+            } else {
+                $("#bottom-desktop-bar").fadeOut("slow").removeClass('d-md-block');
+            }
+
+        }
+
+    }
+    footer();
+});
+
+$(function(){
+
+
+    $(".prizes-tix-btn input").click(function(e) {
+
+        e.stopPropagation();
+    });
+    $(".prizes-tix-btn").click(function () {
+
+        $('#modalQuickPick #double-message').hide();
+        $('#modalQuickPick #before-quickpick, #modalQuickPick #quickpick-checkout, #btn-more-choice').show();
+        $('#modalQuickPick #before-quickpick').addClass('d-flex');
+
+
+        $('.donate-tickets-number').text('');
+
+
+        if ($(this).hasClass('donation-button-chosen') )  {
+            $(this).trigger( "focusout" );
+            $('.donation-button-chosen').removeClass("donation-button-chosen");
+            $("#quickpick").hide();
+            packageSelected =0;
+            submitCartThroughAjax();
+            $(".progress-hidden, .progress-step-chosen, .mychoice").hide();
+            $('.progress-step-custom , .progress-step-custom  .mychoice, .progress-step-custom .progress-step-chosen').hide();
+
+
+
+        } else {
+            var amtTicketsSelected  = $(this).data("amt");
+            $(".donation-button-chosen").removeClass("donation-button-chosen");
+            $('.prizes-tix-btn[data-amt="' +amtTicketsSelected + '"]').addClass("donation-button-chosen");
+
+
+            var donatedAmt = amtTicketsSelected *5;
+            dataLayer.push({
+                event: "donate_"+ donatedAmt,
+              });
+
+            if (amtTicketsSelected == 0) {
+
+                donatedAmt = $('#otherAmount').val();
+                if (LANGUAGE== 'HEB') {
+                    donatedAmt = Number(donatedAmt) / 4;
+                }
+                amtTicketsSelected = Number(donatedAmt) / 5;
+
+
+            }
+
+            if (isNaN(amtTicketsSelected) ||  amtTicketsSelected== 0 ) {
+                amtTicketsSelected = 0;
+                $('#otherAmount').val('').focus();
+                return false;
+            }
+
+
+            $('.donate-tickets-dollar').text(LANGUAGE=='HEB' ? "₪"+ donatedAmt*4: "$" + donatedAmt);
+
+            //if amtselected is not a full number
+
+            if (amtTicketsSelected % 1 != 0) {
+
+                $(".roundWords").show();
+                //round up donatedAmt to closest 5
+if (LANGUAGE== 'HEB') {
+    $('.roundWords button').each(function () {
+        var currentText = $(this).html();
+        var updatedText = currentText.replace("DONATE $", "₪");
+        $(this).html(updatedText);
+    });
+}
+                if (LANGUAGE== 'HEB') {
+                    roundedDonatedAmt = Math.ceil(amtTicketsSelected) * 20;
+                } else {
+                    roundedDonatedAmt = Math.ceil(amtTicketsSelected) * 5;
+                }
+                $('.rounded-new-number').html((LANGUAGE=='HEB' ? "₪":' $') +  roundedDonatedAmt);
+                if (LANGUAGE== 'HEB') {
+
+
+                    $('.roundBefore').html(roundedDonatedAmt - 20);
+
+
+                }else {
+                    $('.roundBefore').html(roundedDonatedAmt - 5);
+                }
+                $('.roundAfter').html(roundedDonatedAmt);
+                 $('#btn-more-choice').hide();
+            } else {
+
+               // var amtEntries = amtTicketsSelected >= 20 ? amtTicketsSelected * 2 : amtTicketsSelected;
+                $('.donate-tickets-number').text(LANGUAGE=='HEB' ? ` זה עבור ${amtTicketsSelected} כרטיסי הגרלה `:`That’s  ${amtTicketsSelected} prize entries!`);
+                $(".roundWords").hide().removeClass('d-flex');
+            }
+
+            if (amtTicketsSelected >= 50 && donatedAmt % 5 == 0) {
+                $("#modalQuickPick").modal('show');
+                var amtTimes = Math.floor(amtTicketsSelected / 50);
+                var quicktext = amtTimes + '&nbsp';
+                if (amtTimes > 1) {
+                    quicktext += LANGUAGE=='HEB' ? 'כרטיסים' : 'tickets ' ;
+                } else {
+                    quicktext +=  LANGUAGE=='HEB' ? 'כרטיס' :'ticket ';
+                }
+                $('.quickpick-times').html(quicktext);
+if (amtTicketsSelected % 50 != 0 ) {
+    //amt of time to quickpick
+    var leftoverticket = Number(amtTicketsSelected % 50);
+    $('.leftover-amount-number').html(LANGUAGE=='HEB' ? '₪' + leftoverticket*20 : '$' + (leftoverticket *5 ));
+    $('.leftover-amount-tickets').html( leftoverticket );
+    $('.leftover-amount').show()
+    // $('p.leftover-amount').addClass('d-flex');
+    $('#modalQuickPick #quickpick-checkout').hide();
+
+} else  {
+
+    $('.leftover-amount').hide();
+}
+            } else {
+
+                if (amtTicketsSelected >= 20 && amtTicketsSelected <50 &&  donatedAmt % 5 == 0) {
+                $('.above-hundred').show();
+                } else {
+                    $('.above-hundred').hide();
+                }
+
+
+                $("#modalYourChoice").modal('show');
+            }
+            packageSelected = amtTicketsSelected;
+            submitCartThroughAjax();
+            $(".progress-hidden, .progress-step-chosen, .mychoice").hide();
+            $(
+                ".progress-step-" +
+                amtTicketsSelected +
+                ", .progress-" +
+                amtTicketsSelected +
+                ", .progress-step-" +
+                amtTicketsSelected +
+                " .mychoice, .progress-step-" +
+                amtTicketsSelected +
+                " .progress-step-chosen"
+            ).show();
+            /* start new progress*/
+            if ( packageSelected % 1 == 0) {
+                //make sure it's a whole number
+                resetProgress(amtTicketsSelected, LANGUAGE);
+                var totalTickets = calculateTotalTickets();
+                totalTickets = totalTickets[0];
+                adjustSlider(totalTickets);
+                submitCartThroughAjax();
+            }
+
+
+        }
+    });
+$('#yes-round-down, #yes-round-up').click(function () {
+
+
+var amt = $(this).find('span').text();
+$('#otherAmount').val(amt);
+
+    $('#btn-more-choice').show();
+    packageSelected =amt/5;
+    submitCartThroughAjax();
+
+    resetProgress(packageSelected, LANGUAGE);
+    var totalTickets = calculateTotalTickets();
+    totalTickets = totalTickets[0];
+    adjustSlider(totalTickets);
+
+    if (amt >= 250) {
+        $('#modalYourChoice').modal('hide');
+        $('#choice-arrow').trigger('click');
+
+
+        if (packageSelected >=50 ) {
+            $("#modalQuickPick").modal('show');
+            var amtTimes = Math.floor(packageSelected / 50);
+            var quicktext = amtTimes + '&nbsp';
+            if (amtTimes > 1) {
+                quicktext += LANGUAGE=='HEB' ? 'כרטיסים' : 'tickets ' ;
+            } else {
+                quicktext +=  LANGUAGE=='HEB' ? 'כרטיס' :'ticket ';
+            }
+            $('.quickpick-times').html(quicktext);
+        }
+    } else {
+        $('.donate-tickets-dollar').text(LANGUAGE=='HEB' ? "₪"+ amt*4: "$" + amt);
+var amtEntries = packageSelected >= 20 ? packageSelected * 2 : packageSelected;
+        $('.donate-tickets-number').text(LANGUAGE=='HEB' ? ` זה עבור ${packageSelected} כרטיסי הגרלה `:`That’s  ${packageSelected} prize entries!`);
+
+        if (packageSelected >=20 && packageSelected<= 50 ) {
+            $('.above-hundred').show();
+        } else  {
+            $('.above-hundred').hide();
+        }
+
+
+        $('.roundWords').hide();
+    }
+
+})
+$('#btn-quickpick').click(function() {
+    //pull out number from $('.quickpick-times').text();
+
+    addQuickPick(Math.floor(packageSelected / 50));
+    // $(".modal").modal('hide');
+});
+
+    $('#modalYourChoice .modal-body button, #modalQuickPick .modal-body button').on('click', function () {
+        debugger;
+        //if viewport top is less that $("#shop").offset().top +500
+        if ($(window).scrollTop() < $("#shop").offset().top + 500) {
+            $('html, body').animate({
+                scrollTop: $("#shop").offset().top - 100
+            }, 1000);
+        }
+    });
+
+    $('#btnToTop').on('hidden.bs.modal', function (e) {
+        e.preventDefault();
+        $('html, body').animate({
+
+            scrollTop: 100
+        }, 1500);
+    });
+
+});
+function handleKeyDown(event) {
+    if (event.keyCode === 13) {
+        // $('#choice-arrow').click();
+        event.preventDefault();
+        $('.donate-5').removeClass('donation-button-chosen');
+        $('.donate-5').click()
+    }
+}
+$('#choice-arrow').click(function (e) {
+    e.stopPropagation();
+
+    $('.donate-5').removeClass('donation-button-chosen');
+    $('.donate-5').click()
+
+
+});
+function addQuickPick (amt) {
+
+    for (var j = 1; j <= 50; j++) {
+        $('.parentdiv[data-id="' + j + '"]')
+            .find(".btn-update-cart input")
+            .val(amt);
+        adjustAmountinPrize(
+            $('.parentdiv[data-id="' + j + '"]').find(".btn-update-cart input"),
+            "quickpick"
+        );
+
+
+    }
+
+    // $(".cart a").trigger("click");
+    submitCartThroughAjax();
+    // $('#quickpick-add-btn i').remove();
+    // $('#quickpick-add-btn button').after('<i>All 50 prizes added to cart</i>');
+
+    $(".ticket-words").text(LANGUAGE == 'HEB' ? 'הכנס שלושה כרטיסים בכל אחד מ50 פרסים' : `You added all 50 prizes to your cart.`);
+
+
+    $('#modalQuickPick #double-message').show();
+    $('#modalQuickPick #before-quickpick').removeClass('d-flex').hide();
+}
+function resetProgress(amtSelected, LANGUAGE )  {
+
+    if ( amtSelected % 1 != 0) {
+        return false
+
+    }
+    $(".progress-step-50 .progress-line-2").hide();
+
+    var packageToDivide = amtSelected && amtSelected >50 ? amtSelected : 50;
+    const percentage = (20 / packageToDivide) * 100 /20;
+
+
+    if (amtSelected != 10)  {
+        $(".progress-10").css("width",  "0%").css('left',0).show();
+
+    } if (amtSelected != 36)  {
+        $(".progress-36").css("width",  "0%").css('left',0).show();
+
+    } else {
+        $(".progress-36").css('left','calc(49% - 50px)').show();
+    }
+
+    $('.progress-step-20').css('left', 'calc(' + (20/packageToDivide*100) + '% - 50px)');
+    $('.progress-step-50').css('left', 'calc(' + (50/packageToDivide *100) + '% - 50px)');
+    $('.progress-50 ').css('left',  (20/packageToDivide*100) + '%');
+    $('.progress-custom').css('left',  (50/packageToDivide*100) + '%');
+
+
+
+words= '';
+
+    if (amtSelected> 50 ||  standardBreakPoints.includes(amtSelected.toString()) == false && amtSelected != 0 ) {
+
+        $('.progress-step-custom').css('left', 'calc(' + (percentage*amtSelected) + '% - 50px)');
+
+        $('.progress-step-custom , .progress-step-custom  .mychoice, .progress-step-custom .progress-step-chosen').show();
+        if (amtSelected >= 20) {
+            words= (LANGUAGE == 'HEB' ? " כפול " : " DOUBLED") +"<br>";
+        }
+        if (amtSelected>= 50 ){
+            words =(LANGUAGE == 'HEB' ?" שילוש "  :  " TRIPLED")+"<br>";
+        }
+        $('#custom-entries').html(amtSelected + (LANGUAGE == 'HEB' ? 'כרטיס '  : ' entries') + words.toLowerCase() );
+
+    if (amtSelected > 50) {
+        $(".progress-20, .progress-50, .progress-custom").css("width", "0%");
+$('.progress-step-10, .progress-step-36').hide();
+    }
+
+
+        /*end new progrss*/
+    } else {
+        //reset if custom is showing
+
+
+       // if ( $('#custom-entries').html()  != "") {
+            $('#custom-entries').html('');
+            $('.progress-step-custom .progress-step-chosen,  .progress-step-custom').hide();
+
+       // }
+    }
+}

@@ -1,0 +1,51 @@
+<body>
+<form #frm="ngForm" class="example-form">
+    <h2> Update donor!</h2>
+    <mat-form-field class="example-full-width">
+      <mat-label>שם התורם</mat-label>
+      <input type="string" matInput [formControl]="nameFormControl" placeholder="" class="form-control" name="giftName"
+        [(ngModel)]="donor.fullName">
+      @if (nameFormControl.hasError('name') && !nameFormControl.hasError('required')) {
+      <mat-error>הכנס שם תורם תקין</mat-error>
+      }
+      @if (nameFormControl.hasError('required')) {
+      <mat-error>name <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+
+    <!--  -->
+
+    <mat-form-field class="example-full-width">
+      <mat-label> מייל</mat-label>
+      <input type="string" matInput [formControl]="mailFormControl" placeholder="" class="form-control"
+        name="email" [(ngModel)]="donor.email">
+      <!-- החלפתי מfullname to donorId -->
+      @if (mailFormControl.hasError('email') && !mailFormControl.hasError('required')) {
+      <mat-error>הכנס מייל תקין</mat-error>
+      }
+      @if (mailFormControl.hasError('required')) {
+      <mat-error>email <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field class="example-full-width">
+      <mat-label>טלפון </mat-label>
+      <input type="string" matInput [formControl]="phoneFormControl" placeholder="Enter your phone" class="form-control" name="phone"
+        [(ngModel)]="donor.phone">
+      <!-- החלפתי מfullname to donorId -->
+      @if (phoneFormControl.hasError('minlength') && !phoneFormControl.hasError('required')) {
+      <mat-error> Enter a valid phone numbers  </mat-error>
+      }
+      @if (phoneFormControl.hasError('required')) {
+      <mat-error>phone <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+    <button mat-button [disabled]="frm.invalid" (click)="saveDonor(donor)"
+    >
+    <mat-icon>save</mat-icon>
+  </button>
+
+  </form>
+ 
+    
+  </body>

@@ -1,0 +1,122 @@
+body {
+  background-color: #001f3d;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contain {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+ 
+  padding: 2%;
+  max-width: 110vw; /* מגבלת רוחב */
+  margin-top: 5vh; /* רווח למעלה */
+  background-color: rgba(0, 31, 61, 0.85); /* רקע שקוף */
+  
+  z-index: 1000; /* מוודא שהמיכל נמצא מעל לכל תוכן אחר */
+  overflow: hidden; /* כדי למנוע גלילה במיכל */
+}
+
+.example-card {
+  max-width: 300px; /* רוחב מקסימלי לכרטיס */
+  width: 100%; /* התאמה אוטומטית */
+  background-color: #001f3d;
+  border: solid 4px #ffffff;
+  /* border-radius: 15px; */
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* צל קל */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* אפקט מעבר */
+}
+
+.example-card:hover {
+  transform: translateY(-5px); /* אפקט הרמה */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* צל עמוק יותר */
+}
+
+.example-header-image {
+  background-size: cover;
+}
+
+.mdc-card__actions {
+  display: flex;
+  justify-content: space-between; /* מרווח בין הכפתורים */
+  align-items: center;
+  background-color: #001f3d;
+  color: #ffd740;
+  padding: 8px;
+}
+
+.search-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* רווח בין שדות החיפוש */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+  width: 30%; /* רוחב מותאם */
+  position: absolute;
+  top: 5%; /* מיקום החיפוש */
+}
+
+.search-container:focus-within {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.search-input {
+  flex-grow: 1;
+  padding: 10px 16px;
+  border: none;
+  outline: none;
+  background-color: #001f3d;
+  border: solid 1px white;
+  border-radius: 20px;
+  color: white;
+  font-size: 16px;
+}
+
+.search-input::placeholder {
+  color: #cccccc;
+}
+
+.search-input:focus {
+  background-color: #f8f8f8;
+  color: black;
+}
+
+.mat-icon {
+  color: #ffd740;
+}
+
+.mat-mdc-card-outlined {
+  border: solid 1.5px #ffffff;
+  /* border-radius: 10px; */
+  margin: 1vh;
+  color: white;
+}
+
+button {
+  background-color: #FF4D4D;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #ff6f6f;
+  transform: scale(1.05); /* אפקט גדילה */
+}
+
+button mat-icon {
+  color: white;
+}
+.mat-mdc-card-subtitle~.mat-mdc-card-title, .mat-mdc-card-title~.mat-mdc-card-subtitle, .mat-mdc-card-header .mat-mdc-card-header-text .mat-mdc-card-title, .mat-mdc-card-header .mat-mdc-card-header-text .mat-mdc-card-subtitle, .mat-mdc-card-title-group .mat-mdc-card-title, .mat-mdc-card-title-group .mat-mdc-card-subtitle{
+  color: #cccccc;
+}

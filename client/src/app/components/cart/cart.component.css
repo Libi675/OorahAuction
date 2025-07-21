@@ -1,0 +1,155 @@
+
+/* עיצוב גוף העמוד */
+body {
+  background-color: rgba(0, 31, 61, 0.95); /* רקע שקוף למחצה */
+  margin: 0%;
+  font-family: 'Assistant', sans-serif;
+  color: white;
+  display: flex;
+  justify-content: flex-end; /* המוצרים בצד ימין */
+  align-items: flex-start;
+  height: 100vh;
+  
+  box-sizing: border-box;
+}
+
+/* עיצוב המיכל הכולל */
+.contain {
+  width: 300px; /* תצוגה צרה בצד */
+  max-height: 90vh; /* גובה מקסימלי */
+  overflow-y: auto; /* גלילה אם יש יותר מדי מוצרים */
+  background-color: rgba(0, 31, 61, 0.85); /* רקע שקוף */
+  border-radius: 12px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* כפתור התשלום */
+button[mat-button] {
+  background-color: #FF4D4D;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0px 4px 8px rgba(255, 77, 77, 0.3);
+  margin: 10px auto 20px auto; /* מרכוז כפתור התשלום */
+}
+
+button[mat-button]:hover {
+  background-color: #e03c3c;
+  transform: scale(1.05);
+}
+
+/* עיצוב הכרטיסים */
+.mat-mdc-card {
+  background-color: #001f3d !important;
+  border: 1px solid #ffffff;
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden; /* מבטיח שהתמונה לא תצא מהכרטיס */
+}
+
+.mat-mdc-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* התאמת התמונה לגודל הכרטיס */
+mat-card-image {
+  width: 60px; /* תמונה קטנה יותר */
+  height: 60px; /* שמירה על יחס ריבועי */
+  object-fit: contain; /* מתאים את התמונה לגבולות */
+  border-radius: 8px;
+  background-color: white;
+  
+}
+
+/* עיצוב טקסט בכרטיס */
+mat-card-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #FFD740;
+  margin: 0;
+}
+
+mat-card-subtitle {
+  font-size: 12px;
+  color: #ffffff;
+  opacity: 0.85;
+  margin: 2px 0;
+}
+.mat-mdc-card-avatar {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-bottom: 16px;
+  object-fit: cover;
+  border: solid 1.5px;
+}
+/* פעולות כרטיס */
+mat-card-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* הכפתור מיושר לימין */
+  gap: 4px;
+}
+
+mat-card-actions button {
+  background-color: #FF4D4D;
+  color: white;
+  border-radius: 15px;
+  font-size: 12px;
+  padding: 4px 8px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+mat-card-actions button:hover {
+  background-color: #e03c3c;
+  transform: scale(1.1);
+}
+
+button[mat-button] mat-icon {
+  color: white;
+}
+mdc-card__media:last-child {
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  width: 6vw;
+  height: 10vh;
+  border: solid 2px wheat;
+}
+.reka{
+  width: 80%;
+  background-color: #f5f5dc47;
+  height: 100%;
+}
+
+/* התאמה למסכים קטנים */
+@media (max-width: 768px) {
+  .contain {
+    width: 80%; /* מסך קטן - יותר רוחב */
+  }
+
+  mat-card-title {
+    font-size: 14px;
+  }
+
+  mat-card-subtitle {
+    font-size: 12px;
+  }
+}

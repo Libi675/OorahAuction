@@ -1,0 +1,83 @@
+/* מבנה עמוד מלא */
+
+html, body {
+  height: 100%; /* ודא שהדף תופס גובה מלא */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: Comfortaa;
+}
+
+/* מיכל הדף */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* מבטיח גובה מלא של העמוד */
+}
+
+/* כותרת עליונה */
+header {
+  background-color: #001e3d75;
+  color: #ffffff;
+  text-align: center;
+  padding: 10px 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 10;
+}
+
+/* תוכן הדף הראשי */
+.content {
+  flex: 1; /* זה גורם לכך שהתוכן יתפוס את כל השטח הפנוי */
+  padding: 0;
+  box-sizing: border-box;
+  overflow: auto; /* מאפשר גלילה במקרה של תוכן רב */
+}
+
+/* עיצוב הפוטר */
+.footer {
+  background-color: #be2a40;
+  color: #ffffff;
+  text-align: center;
+  padding: 10px 0;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* שאר העיצובים שלך */
+.logo {
+  width: 12vw;
+ position: absolute;
+ left: 0vw;
+ top:1vh;
+ margin: 1vw;
+}
+
+nav {
+  top: 0%;
+  color: #be2a40;
+}
+
+.btnheader {
+  color: #530914;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+.title {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 20px;
+  color: #df2929;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3), 0 0 25px rgba(255, 20, 147, 0.8);
+  letter-spacing: 2px;
+  text-align: center;
+  font-weight: bold;
+  margin: 20px;
+  transition: all 0.3s ease-in-out;
+}
+
+.title:hover {
+  color: #be2a40;
+  text-shadow: 0 0 5px rgba(255, 77, 77, 0.7);
+}

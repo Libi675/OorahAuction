@@ -1,0 +1,118 @@
+/* .example-form {
+    min-width: 150px;
+    max-width: 500px;
+    width: 100%;
+  }
+  
+  .example-full-width {
+    width: 100%;
+  }
+  .example-full-width {
+    width: 100%;
+  }
+  
+  td {
+    padding-right: 8px;
+  }
+  .mat-mdc-fab.mat-accent{
+    mdc-fab-container-color: #e0496f;
+    background-color: #e0496f;
+  }
+   */
+   /* גוף הדף */
+body {
+  background-color: #001f3d; /* כחול כהה מאוד */
+  font-family: 'Roboto', sans-serif;
+  height: 100vh; /* דף בגובה מלא */
+  margin: 0;
+  display: flex; /* Flexbox למרכז את התוכן */
+  justify-content: center; /* למרכז את התוכן אופקית */
+  align-items: center; /* למרכז את התוכן אנכית */
+}
+
+/* טופס ההתחברות */
+.example-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px;
+  background-color: #cbcfd5cc;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* צללים עמוקים יותר */
+  max-width: 33vw; /* הגבלת רוחב הטופס */
+  backdrop-filter: blur(10px); /* טשטוש רקע חזק יותר */
+  text-align: center;
+  opacity: 0.9; /* שקיפות קלה לטופס */
+}
+
+/* כותרת טופס */
+h2{
+  color: #FF4D4D; /* לבן לניגודיות גבוהה */
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+/* עיצוב שדות הטופס */
+.mat-form-field {
+  width: 100%; /* שדות הטופס יתפשו את כל הרוחב */
+  margin-bottom: 16px; /* רווח בין השדות */
+}
+
+.mat-form-field .mat-input-element {
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.5); /* גבול בהיר ועדין */
+  background-color: rgba(0, 0, 0, 0.2); /* רקע כהה בשדות */
+}
+
+.mat-form-field input.mat-input-element:focus {
+  border-color: #FF4D4D; /* אדום בהיר כשיש פוקוס */
+  box-shadow: 0 0 5px rgba(255, 77, 77, 0.7); /* הילה עדינה באדום */
+}
+
+/* טקסט שגיאה (אם יש) */
+mat-error {
+  color: #FF4D4D; /* אדום עדין לשגיאות */
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* כפתור התחברות */
+button {
+  background-color: #FF4D4D; /* אדום בהיר לכפתור */
+  color: #fff;
+  border-radius: 4px;
+  margin-top: 20px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+button mat-icon {
+  margin-right: 8px;
+}
+
+button:hover {
+  background-color: #e03a3a; /* אדום כהה יותר בזמן ריחוף */
+  transform: scale(1.05); /* הגדלה קלה בזמן ריחוף */
+}
+
+/* עיצוב מותאם למובייל */
+@media (max-width: 600px) {
+  .example-form {
+      width: 90%;
+  }
+
+  h3 {
+      font-size: 1.5rem; /* גודל טקסט קטן יותר */
+  }
+
+  button {
+      padding: 14px;
+  }
+}

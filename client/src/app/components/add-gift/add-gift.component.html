@@ -1,0 +1,61 @@
+<body>
+  <form #frm="ngForm" class="example-form">
+    <h2>Add gift!</h2>
+
+
+    <div class="col col-4">
+      <mat-form-field class="example-full-width control-label">
+        <input type="text" [(ngModel)]="g.giftName" matInput [formControl]="nameFormControl"
+          placeholder="Enter an uniqe name of gift" class="form-control" name="giftName">
+        <mat-error *ngIf="nameFormControl.hasError('required')">giftName is required</mat-error>
+
+      </mat-form-field>
+    </div>
+
+    <div class="col col-4">
+      <mat-form-field class="example-full-width control-label">
+        <input type="number" [(ngModel)]="g.ticketPrice" matInput [formControl]="ticketPrice"
+          placeholder="Enter price of ticket" class="form-control" name="phone">
+        <mat-error *ngIf="ticketPrice.hasError('required')">ticket price is required</mat-error>
+        <mat-error
+          *ngIf="ticketPrice.hasError('min')|| ticketPrice.hasError('max') && !ticketPrice.hasError('required')">
+          ticketPrice mast be between 10$ - 40$
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field class="example-full-width control-label">
+      <mat-label>בחר קטגוריה</mat-label>
+      <mat-select [(ngModel)]="g.categoryaId" name="categoryaId" required>
+        <mat-option *ngFor="let category of categories" [value]="category.categoryaId">
+          {{ category.nameCategorya }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="nameFormControl.hasError('required')">category is required</mat-error>
+      <mat-error *ngIf="!g.categoryaId">יש לבחור קטגוריה</mat-error>
+    </mat-form-field>
+
+    <mat-form-field class="example-full-width control-label">
+      <mat-label>בחר תורם</mat-label>
+      <mat-select [(ngModel)]="g.donorId" name="donorId" required>
+        <mat-option *ngFor="let donor of donors" [value]="donor.donorId">
+          {{ donor.fullName }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="nameFormControl.hasError('required')">donor is required</mat-error>
+      <mat-error *ngIf="!g.donorId">יש לבחור תורם</mat-error>
+    </mat-form-field>
+
+    <div class="col col-4">
+      <mat-form-field class="example-full-width control-label">
+        <input type="text" [(ngModel)]="g.image" matInput [formControl]="nameFormControl" placeholder="Enter image"
+          class="form-control" name="image">
+        <mat-error *ngIf="nameFormControl.hasError('required')">image is required</mat-error>
+      </mat-form-field>
+    </div>
+
+
+    <button mat-button [disabled]="frm.invalid" (click)="addNewGift(g)">
+      <mat-icon>save</mat-icon></button>
+  </form>
+</body>
