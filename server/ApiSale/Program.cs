@@ -9,10 +9,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using ApiSale.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// äåñôú ùéøåúéí
+// ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 builder.Services.AddScoped<ICategotyDal, CategoryDal>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IDonorDal, DonorDal>();
@@ -25,16 +26,16 @@ builder.Services.AddScoped<IOrderSevice, OrderService>();
 builder.Services.AddScoped<IOrderDal, OrderDal>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-// äåñôú ÷åğôéâåøöéåú
+// ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 builder.Services.AddControllers();
 
-// äåñôú Swagger
+// ï¿½ï¿½ï¿½ï¿½ï¿½ Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 
-    // äâãøú Bearer Authentication
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ Bearer Authentication
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -60,11 +61,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// äåñôú Database å-Authentication
-//builder.Services.AddDbContext<ChainaSaleDBContext>(option =>
-   // option.UseSqlServer("Data Source=localhost;Initial Catalog=Chaina;Integrated Security=True;Encrypt=True;Trust Server Certificate=True"));
-//builder.Services.AddDbContext<ChainaSaleDBContext>(option => option.UseSqlServer("Data Source=SRV2\\PUPILS;Initial Catalog=Oorah;Integrated Security=True;Encrypt=True;Trust Server Certificate=True"));
-builder.Services.AddDbContext<ChainaSaleDBContext>(option => option.UseSqlServer("Data Source=localhost;Initial Catalog=Chaina;Integrated Security=True;Encrypt=True;Trust Server Certificate=True"));
+
 
 builder.Services.AddCors(options =>
 {
@@ -78,9 +75,9 @@ builder.Services.AddCors(options =>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.Cookie.Name = "AuthToken"; // ùí ä÷å÷é ùìê
-        options.LoginPath = "/Login";  // äğúéá ùîôğéí àìéå áî÷øä ùì öåøê áäúçáøåú îçãù
-        options.LogoutPath = "/Logout"; // úåëì ìäåñéó âí ğúéá æä àí úøöä ìäâãéø ğúéá éöéàä îåúàí
+        options.Cookie.Name = "AuthToken"; // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+        options.LoginPath = "/Login";  // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        options.LogoutPath = "/Logout"; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
     });
 
 builder.Services.AddAuthentication(options =>
@@ -114,9 +111,21 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// // ×˜×¢×™× ×ª ×§×•×‘×¥ secrets.json
+// builder.Configuration.AddJsonFile("secrets.json", optional: true, reloadOnChange: true);
+
+// // ×§×¨×™××ª ××—×¨×•×–×ª ×”×—×™×‘×•×¨ ××ª×•×š ×”×§×•×‘×¥
+// var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// // ×©×™××•×© ×‘××—×¨×•×–×ª ×”×—×™×‘×•×¨ (×œ×“×•×’××”, ×¢×‘×•×¨ EF Core)
+// builder.Services.AddDbContext<ChainaSaleDBContext>(options =>
+//     options.UseSqlServer(connectionString));
+// Use the middleware to configure the database
+builder.Services.ConfigureDatabase(builder.Configuration);
+
 var app = builder.Build();
 
-// Middleware å-Request Pipeline
+// Middleware ï¿½-Request Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -125,6 +134,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("CorsPolicy");
+
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Add("Content-Security-Policy", "default-src 'self';");
+    await next();
+});
 
 app.UseMiddleware<CookieToBearerMiddleware>();
 
