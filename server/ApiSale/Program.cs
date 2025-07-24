@@ -13,7 +13,7 @@ using ApiSale.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ����� �������
+
 builder.Services.AddScoped<ICategotyDal, CategoryDal>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IDonorDal, DonorDal>();
@@ -26,16 +26,16 @@ builder.Services.AddScoped<IOrderSevice, OrderService>();
 builder.Services.AddScoped<IOrderDal, OrderDal>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-// ����� ������������
+
 builder.Services.AddControllers();
 
-// ����� Swagger
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 
-    // ����� Bearer Authentication
+    //Bearer Authentication
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -97,7 +97,7 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["JwtSettings:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]))
     };
-    // Add custom logic to retrieve the token from cookies
+    //Add custom logic to retrieve the token from cookies
     options.Events = new JwtBearerEvents
     {
         OnMessageReceived = context =>
@@ -111,21 +111,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// // טעינת קובץ secrets.json
-// builder.Configuration.AddJsonFile("secrets.json", optional: true, reloadOnChange: true);
 
-// // קריאת מחרוזת החיבור מתוך הקובץ
-// var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-// // שימוש במחרוזת החיבור (לדוגמה, עבור EF Core)
-// builder.Services.AddDbContext<ChainaSaleDBContext>(options =>
-//     options.UseSqlServer(connectionString));
-// Use the middleware to configure the database
 builder.Services.ConfigureDatabase(builder.Configuration);
 
 var app = builder.Build();
 
-// Middleware �-Request Pipeline
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
